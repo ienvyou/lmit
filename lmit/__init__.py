@@ -53,7 +53,7 @@ except locale.Error:
 
 # Check Python version
 if sys.version_info < (2, 6) or (3, 0) <= sys.version_info < (3, 3):
-    print('Glances requires at least Python 2.6 or 3.3 to run.')
+    print('LMIT requires at least Python 2.6 or 3.3 to run.')
     sys.exit(1)
 
 # Check PSutil version
@@ -61,7 +61,7 @@ psutil_min_version = (2, 0, 0)
 psutil_version = tuple([int(num) for num in __psutil_version.split('.')])
 
 if psutil_version < psutil_min_version:
-    print('PSutil 2.0 or higher is needed. Glances cannot start.')
+    print('PSutil 2.0 or higher is needed. LMIT cannot start.')
     sys.exit(1)
 
 def __signal_handler(signal, frame):
@@ -69,12 +69,12 @@ def __signal_handler(signal, frame):
     end()
 
 def end():
-    """Stop Glances."""
+    """Stop LMIT."""
     logger.info("Stop LMIT(with CTRL-C)")
 
 def main():
     # Log LMIT and PSutil version
-    logger.info('Start Glances {0}'.format(__version__))
+    logger.info('Start LMIT {0}'.format(__version__))
     logger.info('{0} {1} and PSutil {2} detected'.format(
         platform.python_implementation(),
         platform.python_version(),
@@ -88,3 +88,10 @@ def main():
 
     # Catch the CTRL-C signal
     signal.signal(signal.SIGINT, __signal_handler)
+
+    # LMIT can be ran in standalone, client or server mode
+    if core.is_standalone():
+        logger.info("Start standalone mode")
+
+        # Import the LMIT standalone module
+        from lmit.core.lmit_standalone import LmitStandalone

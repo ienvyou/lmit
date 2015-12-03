@@ -52,6 +52,12 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
                             dest='debug', help='enable debug mode')
         parser.add_argument('-C', '--config', dest='conf_file',
                             help='path to the configuration file')
+        
+        # Client/Server option
+        parser.add_argument('-c', '--client', dest='client',
+                            help='connect to a LMIT server by IPv4/IPv6 address or hostname')
+        parser.add_argument('-s', '--server', action='store_true', default=False,
+                            dest='server', help='run LMIT in server mode')
 
         return parser
 
@@ -61,3 +67,26 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
 
         # Load the configuration file, if it exists
         self.config = Config(args.conf_file)
+
+        # Debug mode
+        if args.debug:
+            print "Setting logging level to DEBUG"
+            from logging import DEBUG
+            logger.setLevel(DEBUG)
+       
+        # Contreol parameter and exit if it is not OK
+        self.args = args 
+
+        return args
+
+    def is_standalone(self):
+        """ Return True if LMIT is running in standalone mode."""
+        return not self.args.client and not self.args.server 
+
+    def is_client(self):
+        """ Return True if LMIT is running in client mode."""
+        return self.args.client and not self.args.server
+
+    def is_server(self):
+        """Return True if LMIT is running in server mode."""
+        return not self.args.client and self.args.server
