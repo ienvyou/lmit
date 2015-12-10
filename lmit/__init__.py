@@ -95,3 +95,7 @@ def main():
 
         # Import the LMIT standalone module
         from lmit.core.lmit_standalone import LmitStandalone
+        
+        # Init the standalone mode
+        standalone = LmitStandalone(config=core.get_config(),
+                                    args=core.get_args())

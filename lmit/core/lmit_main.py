@@ -15,6 +15,7 @@ class LmitMain(object):
     """ Main class to manage Lmit instance."""
     
     # Default stats' refresh time is 3 seconds
+    refresh_time = 3
 
     # Exemple of use
     example_of_use = "\
@@ -58,6 +59,12 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
                             help='connect to a LMIT server by IPv4/IPv6 address or hostname')
         parser.add_argument('-s', '--server', action='store_true', default=False,
                             dest='server', help='run LMIT in server mode')
+        parser.add_argument('-t', '--time', default=self.refresh_time, type=float,
+                            dest='time', help='set refresh time in seconds [default: {0} sec]'.format(self.refresh_time))
+
+        # Display options
+        parser.add_argument('-q', '--quiet', default=False, action='store_true',
+                            dest='quiet', help='do not display the curses interface')
 
         return parser
 
@@ -90,3 +97,11 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
     def is_server(self):
         """Return True if LMIT is running in server mode."""
         return not self.args.client and self.args.server
+
+    def get_config(self):
+        """Return configuration file object."""
+        return self.config
+
+    def get_args(self):
+        """Return the arguments"""
+        return self.args
