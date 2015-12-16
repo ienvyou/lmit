@@ -72,6 +72,14 @@ def end():
     """Stop LMIT."""
     logger.info("Stop LMIT(with CTRL-C)")
 
+    if core.is_standalone():
+        # Stop the standalone (CLI)
+        standalone.end()
+        logger.info("Stop LMIT(with CTRL-C)")
+
+    # The end...
+    sys.exit(0)
+
 def main():
     # Log LMIT and PSutil version
     logger.info('Start LMIT {0}'.format(__version__))
@@ -99,3 +107,6 @@ def main():
         # Init the standalone mode
         standalone = LmitStandalone(config=core.get_config(),
                                     args=core.get_args())
+
+        # Start the standalone (CLI) loop
+        standalone.serve_forever()

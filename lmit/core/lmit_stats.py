@@ -18,3 +18,10 @@ class LmitStats(object):
 
         # Set the config instance
         self.config = config
+
+
+    def end(self):
+        """End of the Glances stats."""
+        # Close export modules
+        
+        # Close plugins
