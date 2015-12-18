@@ -66,6 +66,9 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
         parser.add_argument('-q', '--quiet', default=False, action='store_true',
                             dest='quiet', help='do not display the curses interface')
 
+        parser.add_argument('--theme-white', action='store_true', default=False,
+                            dest='theme_white', help='optimize display colors for white background')
+
         return parser
 
     def parse_args(self):
