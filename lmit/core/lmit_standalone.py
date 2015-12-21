@@ -35,8 +35,7 @@ class LmitStandalone(object):
            
             if not self.quiet:
                 # Update screen
-                #self.screen.update(self.stats)
-                i = 10  
+                self.screen.update(self.stats)
             else:
                 # Wait...
                 sleep(self.refresh_time)

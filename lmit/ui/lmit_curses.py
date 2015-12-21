@@ -31,6 +31,7 @@ from lmit.core.lmit_logging import logger
 # Import curses lib for "normal" operating system and consolelog for Windows
 if not is_windows:
     try:
+        logger.info("This is not a window. Try to load curses panel and textpad")
         import curses
         import curses.panel
         from curses.textpad import Textbox
@@ -38,9 +39,10 @@ if not is_windows:
         logger.critical(
             "Curses module not found. LMIT cannot start in standalone mode.")
         sys.exit(1)
-#else:
-#    from lmit.outputs.glances_colorconsole import WCurseLight
-#    curses = WCurseLight()
+else:
+    logger.info("lmit_colorconsole import succeed. Initialize the screen")
+    from lmit.ui.lmit_colorconsole import WCurseLight
+    curses = WCurseLight()
 
 class _LmitCurses(object):
     """This class manages the curses display(and key pressed)."""
@@ -109,9 +111,30 @@ class _LmitCurses(object):
         else:
             self.hascolors = False
 
+        A_BOLD = curses.A_BOLD
+
+        self.title_color = A_BOLD
+        self.title_underline_color = A_BOLD | curses.A_UNDERLINE
+        self.help_color = A_BOLD
+
         """ Configure color attr """
 
         # Init main window
+        self.term_window = self.screen.subwin(0, 0)
+
+        # Init edit filter tag
+        self.edit_filter = False
+
+        # Catch key pressed with non blocking mode
+        self.no_flash_cursor()
+        self.term_window.nodelay(1)
+        self.pressedkey = -1
+
+        self.term_window.border(0)
+        self.term_window.addstr(2, 2, "Please enter a number...")
+        self.term_window.refresh()
+        #self.screen.refresh()
+        """
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
         self.screen.keypad(1)
@@ -125,6 +148,13 @@ class _LmitCurses(object):
 	self.screen.addstr(6, 4, "3 - Show disk space")
 	self.screen.addstr(7, 4, "4 - Exit")
 	self.screen.refresh()
+        """
+
+    def flash_cursor(self):
+        self.term_window.keypad(1)
+
+    def no_flash_cursor(self):
+        self.term_window.keypad(0)
 
     def set_cursor(self, value):
         """Configure the curse cursor apparence.
@@ -151,6 +181,110 @@ class _LmitCurses(object):
                 pass
         curses.endwin()
 
+    def erase(self):
+        """Erase the content of the screen."""
+        self.term_window.erase()
+
+    def init_line_column(self):
+        """Init the line and column position for the curses inteface."""
+        self.init_line()
+        self.init_column()
+
+    def init_line(self):
+        """Init the line position for the curses inteface."""
+        self.line = 0
+        self.next_line = 0
+
+    def init_column(self):
+        """Init the column position for the curses inteface."""
+        self.column = 0
+        self.next_column = 0
+
+    def flush(self, stats, cs_status=None):
+        """Clear and update the screen.
+        stats: Stats database to display
+        cs_status:
+            "None": standalone or server mode
+            "Connected": Client is connected to the server
+            "Disconnected": Client is disconnected from the server
+        """
+        self.erase()
+        self.display(stats, cs_status=cs_status)
+
+    def display(self, stats, cs_status=None):
+        """Display stats on the screen.
+        stats: Stats database to display
+        cs_status:
+            "None": standalone or server mode
+            "Connected": Client is connected to a Glances server
+            "SNMP": Client is connected to a SNMP server
+            "Disconnected": Client is disconnected from the server
+        Return:
+            True if the stats have been displayed
+            False if the help have been displayed
+        """
+        # Init the internal line/column for Glances Curses
+        self.init_line_column()
+
+    def get_key(self, window):
+        # Catch ESC key AND numlock key (issue #163)
+        keycode = [0, 0]
+        keycode[0] = window.getch()
+        keycode[1] = window.getch()
+
+        if keycode != [-1, -1]:
+            logger.debug("Keypressed (code: %s)" % keycode)
+
+        if keycode[0] == 27 and keycode[1] != -1:
+            # Do not escape on specials keys
+            return -1
+        else:
+            return keycode[0]
+
+    def __catch_key(self, return_to_browser=False):
+        # Catch the pressed key
+        self.pressedkey = self.get_key(self.term_window)
+
+        # Actions
+        if self.pressedkey == ord('\x1b') or self.pressedkey == ord('q'):
+            # 'ESC'|'q' > Quit
+            self.end()
+            logger.info("Stop LMIT client browser")
+            sys.exit(0)
+
+    def update(self, stats, cs_status=None, return_to_browser=False):
+        """ Update the screen
+
+        Wait for __refresh_time sec / catch key every 100 ms.
+        INPUT
+        stats: Stats database to display
+        cs_status:
+            "None": standalone or server mode
+            "Connected": Client is connected to the server
+            "Disconnected": Client is disconnected from the server
+        return_to_browser:
+            True: Do not exist, return to the browser list
+            False: Exit and return to the shell
+        OUPUT
+        True: Exit key has been pressed
+        False: Others cases...
+        """
+
+        # Wait key
+        exitkey = False
+        while not exitkey:
+            # Get key
+            pressedkey = self.__catch_key(return_to_browser=return_to_browser)
+            # Is it an exit key?
+            exitkey = (pressedkey == ord('\x1b') or pressedkey == ord('q'))
+            if not exitkey and pressedkey > -1:
+                # Redraw display
+                self.flush(stats, cs_status=cs_status)
+
+            # Wait 100ms
+            curses.napms(100)
+
+        return exitkey
 
 class LmitCursesStandalone(_LmitCurses):
 
