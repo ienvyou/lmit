@@ -83,6 +83,9 @@ Monitor local machine and export stats to a InfluxDB server with 5s refresh time
             print "Setting logging level to DEBUG"
             from logging import DEBUG
             logger.setLevel(DEBUG)
+
+        # By default help is hidden
+        args.help_tag = False
        
         # Contreol parameter and exit if it is not OK
         self.args = args 

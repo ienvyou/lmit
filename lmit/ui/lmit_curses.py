@@ -130,11 +130,11 @@ class _LmitCurses(object):
         self.term_window.nodelay(1)
         self.pressedkey = -1
 
+        """
         self.term_window.border(0)
         self.term_window.addstr(2, 2, "Please enter a number...")
         self.term_window.refresh()
         #self.screen.refresh()
-        """
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
         self.screen.keypad(1)
@@ -226,6 +226,20 @@ class _LmitCurses(object):
         # Init the internal line/column for Glances Curses
         self.init_line_column()
 
+        # Get the screen size
+        screen_x = self.screen.getmaxyx()[1]
+        screen_y = self.screen.getmaxyx()[0]
+
+        logger.debug('Screen size x: {0}, y: {1}'.format(screen_x, screen_y))
+
+        # Display LMIT menu using curses interface
+        ############################################
+        
+        # Help screen
+        if self.args.help_tag:
+            # Display help plugin 
+            return False
+
     def get_key(self, window):
         # Catch ESC key AND numlock key (issue #163)
         keycode = [0, 0]
@@ -269,6 +283,8 @@ class _LmitCurses(object):
         True: Exit key has been pressed
         False: Others cases...
         """
+        # Flush display
+        self.flush(stats, cs_status=cs_status)
 
         # Wait key
         exitkey = False
