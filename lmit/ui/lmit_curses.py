@@ -134,7 +134,7 @@ class _LmitCurses(object):
         self.term_window.border(0)
         self.term_window.addstr(2, 2, "Please enter a number...")
         self.term_window.refresh()
-        #self.screen.refresh()
+        self.screen.refresh()
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
         curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
         self.screen.keypad(1)
@@ -168,6 +168,32 @@ class _LmitCurses(object):
             except Exception:
                 pass
 
+    def get_key(self, window):
+        # Catch ESC key AND numlock key (issue #163)
+        keycode = [0, 0]
+        keycode[0] = window.getch()
+        keycode[1] = window.getch()
+
+        if keycode != [-1, -1]:
+            logger.debug("Keypressed (code: %s)" % keycode)
+
+        if keycode[0] == 27 and keycode[1] != -1:
+            # Do not escape on specials keys
+            return -1
+        else:
+            return keycode[0]
+
+    def __catch_key(self, return_to_browser=False):
+        # Catch the pressed key
+        self.pressedkey = self.get_key(self.term_window)
+
+        # Actions
+        if self.pressedkey == ord('\x1b') or self.pressedkey == ord('q'):
+            # 'ESC'|'q' > Quit
+            self.end()
+            logger.info("Stop LMIT client browser")
+            sys.exit(0)
+
     def end(self):
         """Shutdown the curses window."""
         if hasattr(curses, 'echo'):
@@ -199,6 +225,10 @@ class _LmitCurses(object):
         """Init the column position for the curses inteface."""
         self.column = 0
         self.next_column = 0
+
+    def new_line(self):
+        """ New line in the curses interface """
+        self.line = self.next_line
 
     def flush(self, stats, cs_status=None):
         """Clear and update the screen.
@@ -240,31 +270,18 @@ class _LmitCurses(object):
             # Display help plugin 
             return False
 
-    def get_key(self, window):
-        # Catch ESC key AND numlock key (issue #163)
-        keycode = [0, 0]
-        keycode[0] = window.getch()
-        keycode[1] = window.getch()
+        #============================================
+        # Display Title line
+        #============================================
+        self.space_between_column = 0
+        self.new_line()
 
-        if keycode != [-1, -1]:
-            logger.debug("Keypressed (code: %s)" % keycode)
+        title = "Linux Management Interface Tool(LMIT)"
 
-        if keycode[0] == 27 and keycode[1] != -1:
-            # Do not escape on specials keys
-            return -1
-        else:
-            return keycode[0]
-
-    def __catch_key(self, return_to_browser=False):
-        # Catch the pressed key
-        self.pressedkey = self.get_key(self.term_window)
-
-        # Actions
-        if self.pressedkey == ord('\x1b') or self.pressedkey == ord('q'):
-            # 'ESC'|'q' > Quit
-            self.end()
-            logger.info("Stop LMIT client browser")
-            sys.exit(0)
+        title_x = screen_x / 2 
+        self.term_window.addstr(1, title_x - (len(title)/2), title)
+        self.term_window.border(0)
+        self.term_window.refresh()
 
     def update(self, stats, cs_status=None, return_to_browser=False):
         """ Update the screen
