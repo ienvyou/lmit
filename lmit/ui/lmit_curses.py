@@ -271,7 +271,7 @@ class _LmitCurses(object):
             return False
 
         #============================================
-        # Display Title line
+        # Display Title line and menu
         #============================================
         self.space_between_column = 0
         self.new_line()
@@ -280,8 +280,16 @@ class _LmitCurses(object):
 
         title_x = screen_x / 2 
         self.term_window.addstr(1, title_x - (len(title)/2), title)
+
+        self.term_window.addstr(3, 2, "Move cursor to desired item and press Enter.")
+        self.term_window.addstr(5, 5, "Software Installation and Maintenance")
+        self.term_window.addstr(6, 5, "Software License Management")
+        self.term_window.addstr(7, 5, "Devices")
+        self.term_window.addstr(8, 5, "System Storage Management (Physical & Logical Storage)")
         self.term_window.border(0)
         self.term_window.refresh()
+
+
 
     def update(self, stats, cs_status=None, return_to_browser=False):
         """ Update the screen
