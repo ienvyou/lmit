@@ -56,6 +56,9 @@ class _LmitCurses(object):
         self.term_w = 80
         self.term_h = 24
 
+        # Self Position
+        self.position = 0
+
         # Space between stats
         self.space_between_column = 3
         self.space_between_line = 2
@@ -129,26 +132,6 @@ class _LmitCurses(object):
         self.no_flash_cursor()
         self.term_window.nodelay(1)
         self.pressedkey = -1
-
-        """
-        self.term_window.border(0)
-        self.term_window.addstr(2, 2, "Please enter a number...")
-        self.term_window.refresh()
-        self.screen.refresh()
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        self.screen.keypad(1)
-        self.screen.bkgd(curses.color_pair(2))
-        self.screen.refresh()
-
-        self.screen.border(0)
-        self.screen.addstr(2, 2, "Please enter a number...")
-	self.screen.addstr(4, 4, "1 - Add a user")
-	self.screen.addstr(5, 4, "2 - Restart Apache")
-	self.screen.addstr(6, 4, "3 - Show disk space")
-	self.screen.addstr(7, 4, "4 - Exit")
-	self.screen.refresh()
-        """
 
     def flash_cursor(self):
         self.term_window.keypad(1)
@@ -276,13 +259,15 @@ class _LmitCurses(object):
         self.space_between_column = 0
         self.new_line()
 
+        mode = curses.A_REVERSE
+
         title = "Linux Management Interface Tool(LMIT)"
 
         title_x = screen_x / 2 
         self.term_window.addstr(1, title_x - (len(title)/2), title)
 
         self.term_window.addstr(3, 2, "Move cursor to desired item and press Enter.")
-        self.term_window.addstr(5, 5, "Software Installation and Maintenance")
+        self.term_window.addstr(5, 5, "Software Installation and Maintenance", mode)
         self.term_window.addstr(6, 5, "Software License Management")
         self.term_window.addstr(7, 5, "Devices")
         self.term_window.addstr(8, 5, "System Storage Management (Physical & Logical Storage)")
