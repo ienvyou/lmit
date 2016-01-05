@@ -91,7 +91,7 @@ def main():
     # Share global var
     global core, standalone, client, server, webserver
     
-    # Create the Glances main instance
+    # Create the LMIT main instance
     core = LmitMain()
 
     # Catch the CTRL-C signal

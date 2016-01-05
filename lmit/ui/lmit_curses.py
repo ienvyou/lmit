@@ -85,6 +85,7 @@ class _LmitCurses(object):
         if curses.has_colors() and curses.COLOR_PAIRS > 8:
             self.hascolors = True
             # FG color, BG color
+            # The init_pair(n, f, b) function changes the definition of color pair n, to foreground color f and background color b
             if args.theme_white:
                 curses.init_pair(1, curses.COLOR_BLACK, -1)
             else:
@@ -229,14 +230,14 @@ class _LmitCurses(object):
         stats: Stats database to display
         cs_status:
             "None": standalone or server mode
-            "Connected": Client is connected to a Glances server
+            "Connected": Client is connected to a LMIT server
             "SNMP": Client is connected to a SNMP server
             "Disconnected": Client is disconnected from the server
         Return:
             True if the stats have been displayed
             False if the help have been displayed
         """
-        # Init the internal line/column for Glances Curses
+        # Init the internal line/column for LMIT Curses
         self.init_line_column()
 
         # Get the screen size
