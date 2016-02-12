@@ -1,23 +1,26 @@
+import os
 import sys
 import time
+import collections
 import curses
 import curses.panel
 from curses.textpad import Textbox
+from lmit_global import plugins_path, sys_path
 from lmit_logger import logger
 
 
 menu_item = {
     'title': "Move cursor to desired item and press Enter",
     'items':[
-        { 'menu': "Software Installation and Maintenance" },    
-        { 'menu': "Software License Management" },    
-        { 'menu': "Devices" },    
-        { 'menu': "System Storage Management (Physical & Logical Storage)" },    
-        { 'menu': "Security & Users" },    
-        { 'menu': "Communications Applications and Services" },    
-        { 'menu': "Problem Determination" },    
-        { 'menu': "System Environments" },    
-        { 'menu': "Create OSC Monthly System Check Report" },    
+        { 'key': "install", 'menu': "Software Installation and Maintenance" },    
+        { 'key': "license", 'menu': "Software License Management" },    
+        { 'key': "device", 'menu': "Devices" },    
+        { 'key': "storage", 'menu': "System Storage Management (Physical & Logical Storage)" },    
+        { 'key': "security", 'menu': "Security & Users" },    
+        { 'key': "application", 'menu': "Communications Applications and Services" },    
+        { 'key': "problem", 'menu': "Problem Determination" },    
+        { 'key': "environment", 'menu': "System Environments" },    
+        { 'key': "report", 'menu': "Create OSC Monthly System Check Report" },    
     ]
 }
 
@@ -25,6 +28,13 @@ class LmitMain(object):
     """ Draw main menu """
 
     def __init__(self):
+        logger.info("Plugins Directory(location: %s)" % plugins_path)
+        # Init the plugin list dict
+        self._plugins = collections.defaultdict(dict)
+
+        # Load plugins
+        self.load_plugins(args=None) 
+        
         # Init windows positions
         self.term_w = 80
         self.term_h = 24
@@ -69,6 +79,24 @@ class LmitMain(object):
         self.pressedkey = -1
 
         self.term_window.erase()
+
+    def load_plugins(self, args=None):
+        """ Load all plugins in the 'plugins' directory."""
+        header = "lmit_"
+        for item in os.listdir(plugins_path):
+            if (item.startswith(header) and
+                item.endswith(".py")):
+                # Import the plugin
+                plugin = __import__(os.path.basename(item)[:-3])
+                plugin_name = os.path.basename(item)[len(header):-3].lower()
+
+                self._plugins[plugin_name] = plugin.SubMenu(args=args)
+        # Log plugin list
+        logger.info("Available plugins list: {0}".format(self.getAllPlugins()))
+
+    def getAllPlugins(self):
+        """Return the plugins list."""
+        return [p for p in self._plugins]
 
     def end(self):
         """Shutdown the curses window."""
@@ -179,6 +207,13 @@ class LmitMain(object):
                 elif self.pressedkey == 10:
                     item = menu_item['items'][self.position]
                     logger.info('Enter Key Event - {0}'.format(item['menu']))
+                    logger.info('Menu Key Name - {0}'.format(item['key']))
+              
+                    # Load plugin class from dictionary
+                    plugin = self._plugins[item['key']]
+              
+                    # Call override method
+                    plugin.process()
 
                 # Redraw display
                 self.display()
