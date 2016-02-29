@@ -2,9 +2,6 @@ import os
 import sys
 import time
 import collections
-import curses
-import curses.panel
-from curses.textpad import Textbox
 from lmit_global import plugins_path, sys_path
 from lmit_logger import logger
 from lmit_menu import LmitMenu
@@ -40,8 +37,7 @@ class LmitMain(object):
         """ Load all plugins in the 'plugins' directory."""
         header = "lmit_"
         for item in os.listdir(plugins_path):
-            if (item.startswith(header) and
-                item.endswith(".py")):
+            if (item.startswith(header) and item.endswith(".py")):
                 # Import the plugin
                 plugin = __import__(os.path.basename(item)[:-3])
                 plugin_name = os.path.basename(item)[len(header):-3].lower()
