@@ -10,17 +10,18 @@ from lmit_menu import LmitMenu
 menu_item = {
     'title': "Move cursor to desired item and press Enter",
     'items':[
-        { 'key': "install", 'menu': "Software Installation and Maintenance" },    
-        { 'key': "license", 'menu': "Software License Management" },    
-        { 'key': "device", 'menu': "Devices" },    
-        { 'key': "storage", 'menu': "System Storage Management (Physical & Logical Storage)" },    
-        { 'key': "security", 'menu': "Security & Users" },    
-        { 'key': "application", 'menu': "Communications Applications and Services" },    
-        { 'key': "problem", 'menu': "Problem Determination" },    
-        { 'key': "environment", 'menu': "System Environments" },    
-        { 'key': "report", 'menu': "Create OSC Monthly System Check Report" },    
+        {'key': "install", 'menu': "Software Installation and Maintenance"},
+        {'key': "license", 'menu': "Software License Management"},
+        {'key': "device", 'menu': "Devices"},
+        {'key': "storage", 'menu': "System Storage Management (Physical & Logical Storage)"},
+        {'key': "security", 'menu': "Security & Users"},
+        {'key': "application", 'menu': "Communications Applications and Services"},
+        {'key': "problem", 'menu': "Problem Determination"},
+        {'key': "environment", 'menu': "System Environments"},
+        {'key': "report", 'menu': "Create OSC Monthly System Check Report"},
     ]
 }
+
 
 class LmitMain(object):
     """ Draw main menu """
