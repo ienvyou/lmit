@@ -38,7 +38,7 @@ class LmitMain(object):
         """ Load all plugins in the 'plugins' directory."""
         header = "lmit_"
         for item in os.listdir(plugins_path):
-            if (item.startswith(header) and item.endswith(".py")):
+            if item.startswith(header) and item.endswith(".py"):
                 # Import the plugin
                 plugin = __import__(os.path.basename(item)[:-3])
                 plugin_name = os.path.basename(item)[len(header):-3].lower()

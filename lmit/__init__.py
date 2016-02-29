@@ -74,4 +74,7 @@ def main():
     # Catch the CTRL-C signal
     signal.signal(signal.SIGINT, __signal_handler)
 
+    # Load Plug-In directory
+    core.getAllPlugins()
+
     core.process()
