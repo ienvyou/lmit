@@ -54,6 +54,6 @@ class LmitMain(object):
     def process(self):
         logger.info("LMIT Main Process is started")
         
-        menu = LmitMenu(menu_item)
+        menu = LmitMenu(menu_item, self._plugins)
         menu.process()
 
